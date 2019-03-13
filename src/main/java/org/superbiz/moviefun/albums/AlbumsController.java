@@ -50,9 +50,15 @@ public class AlbumsController {
     public String uploadCover(@PathVariable long albumId, @RequestParam("file") MultipartFile uploadedFile) throws IOException {
 
 //        File coverFile = getCoverFile(albumId);
+
+        // to upload we need to convert our file into inputstream
+        //We need type and name as well
+        //store it into blob obj
+
+
         InputStream inputStream = uploadedFile.getInputStream();
         String contentType = uploadedFile.getContentType();
-        String name = getCoverFileName(albumId);
+        String name = format("covers/%d", albumId);
         Blob blob = new Blob(name, inputStream, contentType);
         blobStore.put(blob);
 
@@ -62,7 +68,14 @@ public class AlbumsController {
     @GetMapping("/{albumId}/cover")
     public HttpEntity<byte[]> getCover(@PathVariable long albumId) throws IOException, URISyntaxException {
 
-        String coverFileName = getCoverFileName(albumId);
+        // To get from the id
+        // we need the path wwhere the file is stored
+        //after the path store the file into an object
+        //To view it we need to parse it as a byte stream
+        //present it with http header
+
+
+        String coverFileName = format("covers/%d", albumId);
         Path coverFilePath = getExistingCoverPath(albumId);
         Optional<Blob> optionalBlob = blobStore.get(coverFileName);
 
@@ -119,8 +132,6 @@ public class AlbumsController {
         } else {
             coverFilePath = Paths.get(getClass().getClassLoader().getResource("default-cover.jpg").toURI());
         }
-
         return coverFilePath;
     }
-
 }
